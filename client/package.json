@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@vue/cli-service": "^4.5.11",
+    "axios": "^0.21.1",
+    "vue": "^2.6.12",
+    "vue-cookies": "^1.7.4"
+  },
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  }
+}

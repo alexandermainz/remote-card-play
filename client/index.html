@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Das Online-Kartenspiel</title>
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+        <link rel="stylesheet" type="text/css" href="styles.css"/>
+        <!-- development version, includes helpful console warnings -->
+        <script src="node_modules/vue/dist/vue.min.js"></script>
+        <script src="node_modules\axios\dist\axios.min.js"></script>
+        <script src="node_modules/vue-cookies/vue-cookies.js"></script>
+    
+    </head>
+    <body>
+    <div id="remote-card-play">
+        <div class="container-fluid">
+            <div class="row" id="header-line"><div class="col-md-12"><h2>Kartenspielserver</h2></div></div>
+
+            <login-form inline-template>
+                <div class="row" id="loginform" v-bind:style="{ display: displayLogin }">
+                    <div class="col-md-3"><h3>Anmeldung</h3></div>
+                    <div class="col-md-7">
+                            <form class="form-floating">
+                            <div class="form-floating">
+                                <label for="input-username" class="form-label">Benutzername:</label>
+                                <input id="input-username" class="form-control" type="text" v-model="user" name="user" placeholder="">
+                            </div>
+                            <div class="form-floating">
+                                <label for="input-password" class="form-label">Kennwort:</label>
+                                <input id="input-password" class="form-control" type="password" v-model="pass" name="pass" placeholder="">
+                            </div><br>
+                            <div class="form-floating">
+                                <button type="button" class="btn btn-outline-success" v-on:click="doLogin()">Anmelden</button>
+                                <p>{{errorText}}</p>
+                            </form></div>
+                    </div>
+                    <div class="col-md-2"></div>
+                </div>
+            </login-form>
+
+            <div class="row">
+                <div id="playerlist" class="col-md-2">
+                    <p>Spieler:</p>
+                </div>
+                <div id="playtable" class="col-md-8">
+                    
+                </div>
+                <div id="trickstack" class="col-md-2">
+                    
+                </div>
+            </div>
+
+            <div id="playershand" class="row">
+            <card-hand ref="refCardHand" inline-template>
+            <div id="cardhand">
+                <div v-for="(onecard, idx) in playersHand" :key='onecard.id' class="cardindeck" v-bind:style="'left:-'+(idx*3)+'%;'" v-bind:class="{ cardclicked: onecard.clicked }" draggable @dragstart='startDrag($event, onecard)' @drop='onDrop($event, idx)' @dragover.prevent @dragenter.prevent>
+                    <img v-bind:src="'../resources/' + onecard.image" class="playingcard" v-on:click="cardClicked(idx);">
+                    <p>{{onecard.clicked}}</p>
+                </div>
+            </div>
+            </card-hand>
+            </div>
+            <div class="row"><div class="col-md-12"><p>Fusszeile.</p></div></div>
+        </div>
+    </div>
+    </body>
+    <script src="index.js"></script>
+</html>
+    

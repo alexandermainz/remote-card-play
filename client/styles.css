@@ -1,0 +1,76 @@
+table, form {
+    margin-bottom: 10px;
+}
+
+td {
+    padding: 2px;
+}
+
+#header-line {
+    background-color: lightblue;
+    margin-bottom: 10px;
+}
+
+.right {
+    text-align: right;
+}
+
+.center {
+    text-align: center;
+}
+
+#cardhand {
+    margin-left: 1cm;
+    width: 100%;
+    display: table;
+    white-space: nowrap;
+}
+#cardhand2::after {
+    content: ' ';
+    display: table;
+    clear: both;
+}
+
+.cardindeck {
+    vertical-align: middle;
+    display: table-cell;
+    position: relative;
+}
+
+.cardindeck img {
+    width: 300%;
+    max-width: 300px;
+}
+
+img.playingcard {
+    border: 1px solid black;
+}
+
+.cardclicked {
+    top: -40px;
+}
+
+img.cardsingle {
+
+}
+
+img.cardtable {
+
+
+}
+
+#playershand {
+    margin-top: 0.5cm;
+}
+
+#playtable {
+    background-color: azure;
+}
+
+#playerlist {
+    background-color: beige;
+}
+
+#trickstack {
+    background-color: darkgrey;
+}
