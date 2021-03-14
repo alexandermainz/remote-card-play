@@ -1,12 +1,26 @@
 {
+  "name": "remote-card-play",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
   "dependencies": {
     "@vue/cli-service": "^4.5.11",
     "axios": "^0.21.1",
     "vue": "^2.6.12",
     "vue-cookies": "^1.7.4"
   },
-  "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
-  }
+  "devDependencies": {
+    "@vue/cli-service": "~4.5.0",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "_id": "remote-card-play@0.0.1",
+  "readme": "ERROR: No README data found!"
 }
