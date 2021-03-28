@@ -33,31 +33,34 @@ playerId int,
 cardId int,
 ordr int
 );
-create table tricks (
-id integer primary key,
-gameId int,
-playerId int,
-cardId int,
-round int
-);
 create table draws (
 id integer primary key,
 gameId int,
 round int,
 position int,
 playerId int,
-cardId int
+cardId int,
+winner int, -- -> player.id
+handId int -- -> from which handId was that draw
 );
 create table games (
 id integer primary key,
 gamedate TEXT,
-creator int,
-deckId int
+giver int, -- -> player.id
+tableId int -- -> table.id
 );
 create table players (
 id integer primary key,
 email TEXT,
-nickname TEXT
+nickname TEXT,
+currentTable int,
+inCurrentRound int,
+);
+create table tables (
+id integer primary key,
+description TEXT,
+createdate TEXT,
+deckId int
 );
 
 create view v_hands as
