@@ -45,9 +45,10 @@ export default {
         .post('/login', { email: this.user, pass: this.pass })
         .then(response => {
             if (response.data.status === undefined) {
-                this.$cookies.set('user', { playerId: response.data.playerId, token: "" });
+                this.$cookies.set('user', { playerId: response.data.playerId, nickname: response.data.nickname });
                 this.displayLogin = "none";
-                this.$parent.getHand();
+                this.$parent.playerNick = response.data.nickname;
+                this.$parent.refresh();
             }
             else {
                 this.errorText = "Ein Fehler ist aufgetreten: " + response.data.statustext;

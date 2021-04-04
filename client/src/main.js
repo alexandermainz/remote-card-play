@@ -4,6 +4,7 @@
  * https://github.com/axios/axios#axiosgeturl-config
  * https://www.npmjs.com/package/vue-cookies
  * https://www.npmjs.com/package/vue-socket.io
+ * https://bootstrap-vue.org/docs/
  */
 
 import Vue from 'vue'
@@ -11,11 +12,16 @@ import App from './App.vue'
 import VueCookies from 'vue-cookies'
 import axios from 'axios'
 import VueSocketIO from 'vue-socket.io'
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 Vue.use(VueCookies)
 Vue.use(axios);
+Vue.use(BootstrapVue);
+Vue.use(IconsPlugin);
 Vue.use(new VueSocketIO({
-  debug: true,
+  debug: false,
   connection: 'http://localhost:80'
 }));
 
@@ -25,6 +31,7 @@ Vue.$cookies.config("7d", "/", "", "", "Strict");  // default: expireTimes = 1d,
 
 //const apiUrl = 'https://api-cardplay.ash-soft.de';
 axios.defaults.baseURL = 'http://localhost:80';
+axios.defaults.withCredentials = true;
 
 var TheApp = new Vue({
   render: function (h) { return h(App) },

@@ -1,5 +1,7 @@
 <template>
 <div id="cardhand" v-if="playersHand.length>0">
+    <div class="alert-danger" v-if="errorText != ''">{{ errorText }}</div>
+
     <div v-for="(handId, idx) in sortedHand" :key='idx' class="cardindeck" v-bind:style="'left:-'+(idx*3)+'%;'" v-bind:class="{ cardclicked: playersHand.find(aCard => aCard.id == handId).clicked }" draggable @dragstart='startDrag($event, idx)' @drop='onDrop($event, idx)' @dragover.prevent @dragenter.prevent>
         <img v-bind:src="'resources/' + playersHand.find(aCard => aCard.id == handId).image" class="playingcard" v-on:click="cardClicked(idx);">
     </div>
@@ -12,7 +14,7 @@ export default {
   name: 'CardHand',
     data: function() {
       return {
-          errorText: "",
+          errorText: '',
           showWaitSpinner: false,
           playersHand: [],
           sortedHand: []
@@ -21,22 +23,20 @@ export default {
     methods: {
         getHand: function() {
             const playerId = this.$cookies.get('user').playerId;
-            console.log("getHand("+playerId+")");
             axios
             .get('/player/'+playerId+'/hand')
             .then(response => {
               if (response.data.status === undefined) {
                 this.playersHand = response.data;
                 this.getSortedHand();
-                this.errorText = "Loaded " + this.playersHand.length;              
               }
               else {
                 this.errorText = "getHand(): Error: " + response.data.statustext;
-                console.log(response.data);
+                console.log("Error!", response.data);
               }
             })
             .catch(error => {
-              console.log(error);
+              console.log("Error!", error);
               this.errorText = "There has been an error contacting the card play server. Please try again. We are sorry for the inconvenience!";
             })
             .finally(() => this.showWaitSpinner = false)

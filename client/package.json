@@ -9,6 +9,8 @@
   "dependencies": {
     "@vue/cli-service": "^4.5.11",
     "axios": "^0.21.1",
+    "bootstrap": "^4.6.0",
+    "bootstrap-vue": "^2.21.2",
     "socket.io-client": "^2.4.0",
     "vue": "^2.6.12",
     "vue-cookies": "^1.7.4",

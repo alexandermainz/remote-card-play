@@ -53,6 +53,7 @@ create table players (
 id integer primary key,
 email TEXT,
 nickname TEXT,
+password TEXT,
 currentTable int,
 inCurrentRound int,
 );
