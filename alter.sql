@@ -143,12 +143,17 @@ values
 (1, 23, 2, 4, 0),
 (1, 24, 4, 11, 0);
 -- Doppelkopfspiel:
-select c.color, c.value, d.points, d.trump
-from cards c join decks_cards d on d.cardId=c.id
-order by trump asc, rank ASC
+--select c.color, c.value, d.points, d.trump
+--from cards c join decks_cards d on d.cardId=c.id
+--order by trump asc, rank ASC
 
-insert into players (email, nickname) VALUES
-('alexschmitt@arcor.de','Lexi'),
-('alexschmitt@arcor.de','Chris'),
-('alexschmitt@arcor.de','Hans'),
-('alexschmitt@arcor.de','Frank');
+insert into players (email, nickname, password) VALUES
+('alexschmitt@arcor.de','Lexi','a307fa10fd93e16a0f62f1bf4c2c33c30738074b0546e0ca7ed5a6d07a7ee28b'),
+('Christian','Christian','a307fa10fd93e16a0f62f1bf4c2c33c30738074b0546e0ca7ed5a6d07a7ee28b'),
+('Hans-Joachim','Hans-J.','a307fa10fd93e16a0f62f1bf4c2c33c30738074b0546e0ca7ed5a6d07a7ee28b'),
+('Frank','Frank','a307fa10fd93e16a0f62f1bf4c2c33c30738074b0546e0ca7ed5a6d07a7ee28b'),
+('Jochen','Jochen','a307fa10fd93e16a0f62f1bf4c2c33c30738074b0546e0ca7ed5a6d07a7ee28b'),
+('Stephan Horn','Stephan H.','a307fa10fd93e16a0f62f1bf4c2c33c30738074b0546e0ca7ed5a6d07a7ee28b');
+
+insert into tables (description, creationdate, deckId)
+values ('DoKo von Alex', '2022-04-04', 1);

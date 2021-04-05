@@ -9,7 +9,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 export default {
   name: 'CardHand',
     data: function() {
@@ -22,9 +21,8 @@ export default {
     },
     methods: {
         getHand: function() {
-            const playerId = this.$cookies.get('user').playerId;
-            axios
-            .get('/player/'+playerId+'/hand')
+            this.axios
+            .get('/player/'+this.$parent.playerId+'/hand')
             .then(response => {
               if (response.data.status === undefined) {
                 this.playersHand = response.data;

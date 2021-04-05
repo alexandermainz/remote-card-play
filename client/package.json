@@ -13,8 +13,10 @@
     "bootstrap-vue": "^2.21.2",
     "socket.io-client": "^2.4.0",
     "vue": "^2.6.12",
+    "vue-axios": "^3.2.4",
     "vue-cookies": "^1.7.4",
-    "vue-socket.io": "^3.0.10"
+    "vue-socket.io": "^3.0.10",
+    "vuejs-jwt": "^1.1.0"
   },
   "devDependencies": {
     "@vue/cli-service": "~4.5.0",

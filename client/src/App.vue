@@ -2,12 +2,17 @@
   <div id="app">
     <div class="container-fluid">
       <div class="row alert-danger" v-if="errorText != ''">{{ errorText }}</div>
-      <div class="row" id="header-line"><div class="col-md-12">
+      <div class="row" id="header-line"><div class="col-md-9">
         <img id="favicon" style="margin: 3px;" src="favicon.png" align="left">
         <h2 style="line-height: 66px;">KartenPlayer.de</h2>
+      </div><div class="col-md-3" style="align-self: flex-end;">
+        <p class="text-right align-bottom"><span class="link" v-on:click="logout()">Abmelden</span></p>
+        <p class="text-right align-bottom"><span class="link" v-on:click="changePassword()">Kennwort ändern</span></p>
       </div></div>
       
       <login-form ref="refLoginForm" />
+
+      <change-password ref="refChangePassword" />
 
       <div class="row" id="row-play-table">
           <div id="playerlist" class="col-md-2">
@@ -50,7 +55,7 @@
               <p class="card-text">Sortiere die Karten auf Deiner Hand mittels "Drag & Drop" (Klicken und ziehen).</p>
               <p class="card-text">Klicke auf eine Karte um sie zu selektieren, klicke auf die selektierte Karte, um diese auszuspielen.</p>
               <p class="card-text">Deine gespielte Karte kannst Du zurücknehmen, so lange der nächste Spieler noch nicht ausgespielt hat. Klicke hierzu auf Deine Karte auf dem Spieltisch.</p>
-              <p class="card-text">Du kannst jederzeit den letzten Stich nochmal aufrufen, indem Du auf den Stichestapel rechts neben dem Spieltishc klickst. Alle Mitspieler sehen dann den letzten Stich auf dem Spieltisch. Mit Klick auf eine Karte auf dem Tisch kannst Du den letzten Stich wieder verbergen.</p>
+              <p class="card-text">Du kannst jederzeit den letzten Stich nochmal aufrufen, indem Du auf den Stichestapel rechts neben dem Spieltisch klickst. Alle Mitspieler sehen dann den letzten Stich auf dem Spieltisch. Mit Klick auf eine Karte auf dem Tisch kannst Du den letzten Stich wieder verbergen. Bitte beachte: Wenn Dein Display sehr schmal ist, werden die einzelnen Bereiche automatisch untereinander anstatt nebeneinander angeordnet.</p>
               <p class="card-text">Wenn Du einen Stich gemacht hast, klicke auf eine Karte auf dem Kartentisch, um den Stich an Dich zu nehmen. Falls Deine Karte die latze Karte in dem Stich war, wird KartenPlayer Dich sicherheitshalber fragen, ob Du den Stich nehmen oder die gespielte Karte zurücknehmen möchtest.</p>
               <p class="card-text">Links neben dem Spieltisch siehst Du die Namen aller Spieler am Spieltisch sowie die Reihenfolge, in der die Spieler am Tisch sitzen. Die Teilnehmer am aktuellen Spiel sind <b>fett</b> gedruckt. Unter der Namensliste wird angezeigt, wer als nächster am Zug ist.</p>
               <p class="card-text">Ist das aktuelle Spiel zuende, kannst Du Deine Punkte zählen, indem Du auf Deinen Stichestapel klickst. Unter der Namensliste erscheint ein Button zum neuen Geben der Karten.</p>
@@ -81,17 +86,18 @@
 </template>
 
 <script>
-import axios from 'axios';
 import LoginForm from './components/LoginForm.vue'
 import CardHand from './components/CardHand.vue'
 import TableDraws from './components/TableDraws.vue'
+import ChangePassword from './components/ChangePassword.vue'
 
 export default {
   name: 'App',
   components: {
     LoginForm,
     CardHand,
-    TableDraws
+    TableDraws,
+    ChangePassword
   },
   data: function() {
     return {
@@ -99,6 +105,7 @@ export default {
       hasTricks: false,
       players: [],
       playerNick: '',
+      playerId: 0,
       selectedPlayers: [],
       myPoints: -1
     }
@@ -110,9 +117,8 @@ export default {
       this.getPlayers();
     },
     getPlayers: function() {
-      const playerId = this.$cookies.get('user').playerId;
-      axios
-      .get('/players?playerId='+playerId)
+      this.axios
+      .get('/players?playerId='+this.playerId)
       .then(response => {
         if (response.data.status === undefined) {
           this.players = response.data;
@@ -161,18 +167,17 @@ export default {
       return false;
     },
     isGameReady: function() {
-      const playerId = this.$cookies.get('user').playerId;
       if (this.players && this.players.length > 0 &&
           this.$refs.refPlayTable && this.$refs.refPlayTable.currentDraw.length == 0 &&
           this.$refs.refCardHand.playersHand.length == 0 && 
-          this.players.find(pl => pl.id == playerId).inCurrentRound) {
+          this.players.find(pl => pl.id == this.playerId).inCurrentRound) {
         return true;
       }
       else
         return false;
     },
     playCard: function(handCard) {
-      axios
+      this.axios
       .put('/playhand/'+handCard.id)
       .then(response => {
         if (response.data.status === "OK") {
@@ -190,9 +195,8 @@ export default {
       })
     },
     createNewGame: function() {
-      const playerId = this.$cookies.get('user').playerId;
-      axios
-      .post('/createGame', { giverId: playerId, players: this.selectedPlayers })
+      this.axios
+      .post('/createGame', { giverId: this.playerId, players: this.selectedPlayers })
       .then(response => {
         if (response.status === 204) {
           console.log("new game created.");
@@ -217,7 +221,7 @@ export default {
       }
       else {
         // show last trick
-        axios
+        this.axios
         .get('/showlast')
         .then(response => {
           if (response.status !== 200) {
@@ -226,6 +230,15 @@ export default {
           }
         })
       }
+    },
+    logout: function() {
+      this.$cookies.remove('jwtauth');
+      this.playerId = 0;
+      this.nickname = '';
+      this.$refs.refLoginForm.displayLogin = "flex";
+    },
+    changePassword: function() {
+      this.$refs.refChangePassword.display = "flex";
     }
   },
   sockets: {
@@ -247,12 +260,13 @@ export default {
 
   },
   mounted: function() {
-    console.log("Vue app created.");
-    const cookie = this.$cookies.get('user');
+    console.log("Vue app created. Try to get playerId and Nickname from JWT...");
     const jwtAuth = this.$cookies.get('jwtauth');
-    if (cookie && cookie.playerId > 0 && jwtAuth) {    // TODO: Ablauf des JWT prüfen
+    if (jwtAuth) {    // TODO: Ablauf des JWT prüfen
       this.$refs.refLoginForm.displayLogin = "none";
-      this.playerNick = cookie.nickname;
+      const decoded = this.$jwt.decode();
+      this.playerId = decoded.playerId;
+      this.playerNick = decoded.nickname;
       this.refresh();
     }
   }
@@ -327,5 +341,9 @@ img.tricks {
 .collapsed > .when-open,
 .not-collapsed > .when-closed {
   display: none;
+}
+
+.link {
+  cursor: pointer;
 }
 </style>

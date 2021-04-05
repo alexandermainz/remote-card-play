@@ -40,13 +40,14 @@ const sio = require('socket.io')(app.listen(port, () => console.log(`App listeni
 app.use(express.json()) // for parsing application/json
 app.use(cookieParser())
 
-app.get("/", (req, res) => res.send("Heartbeat."));
-
 const dbpath = process.env.DB_PATH;
+
+app.get("/", (req, res) => res.send("Heartbeat.<br>DB: " + dbpath));
 
 let db = new sqlite3.Database(dbpath, sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
-      console.error(err.message);
+        console.error(err.message);
+        throw err;
     }
     else
         console.log('Connected to the card-play database.');
@@ -80,7 +81,6 @@ app.post("/login", (req, res) => {
             const hash = createHash('sha256');
             hash.update(req.body.pass);
             const hashed = hash.digest('hex');
-            console.log(hashed);
             db.get("SELECT id AS playerId, nickname FROM players WHERE email=$email AND password=$hashed", 
              { $email: req.body.email, $hashed: hashed }, (err, row) => {
                 if (err) {
@@ -109,6 +109,31 @@ app.post("/login", (req, res) => {
     });
 });
 
+app.put("/changepassword", authenticateToken, (req, res) => {
+    const db = new sqlite3.Database(dbpath, sqlite3.OPEN_READWRITE, (err) => {
+        if (err) {
+            console.log(err);
+            res.status(500).json({ status: "Error", statustext: "Could not connect to the database!" });
+        }
+        else {
+            const hash = createHash('sha256');
+            hash.update(req.body.pass);
+            const hashed = hash.digest('hex');
+            db.run("UPDATE players SET password=$hashed WHERE id=$playerId", 
+             { $playerId: req.user.playerId, $hashed: hashed }, (err, row) => {
+                if (err) {
+                   console.log(err);
+                   res.status(500).json({ status: "Error", statustext: "Server error while changing the passwort!" });
+                }
+                else {
+                    res.json({ status: "OK", statustext: "Password changed successfully."});
+                }
+                db.close();
+            });
+        }
+    });
+});
+
 /*
 * Create a new card game.
 * Body: { giverId : player.id of the "giver" of this game,
@@ -119,6 +144,7 @@ app.post("/login", (req, res) => {
 * - 500 with { status, statutext } when error occured.
 */
 app.post("/createGame", authenticateToken, (req, res) => {
+    if (req.body.giverId != req.user.playerId) res.sendStatus(403);
     const db = new sqlite3.Database(dbpath, sqlite3.OPEN_READWRITE, (err) => {
         if (err) {
             console.log(err);

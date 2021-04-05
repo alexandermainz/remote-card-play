@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 export default {
   name: 'TableDraws',
   data: function() {
@@ -38,8 +37,8 @@ export default {
   },
   methods: {
     getDraws: function() {
-      const playerId = this.$cookies.get('user').playerId;
-      axios
+      const playerId = this.$parent.playerId;
+      this.axios
       .get('/draws?playerId='+playerId)
       .then(response => {
         if (response.data.status === undefined) {
@@ -75,9 +74,8 @@ export default {
       return roundOfLastTrick + 1;
     },
     cardClicked: function(card) {
-      const playerId = this.$cookies.get('user').playerId;
       // last played card can be revoked by the one who played it
-      if (this.lastCard.playedById == playerId) {
+      if (this.lastCard.playedById == this.$parent.playerId) {
         // if this was the last card, take back or take the trick?
         if (this.currentDraw.length == this.$parent.getNumPlayersInRound()) {
           this.$bvModal.show('takeTrickModal');
@@ -95,7 +93,7 @@ export default {
       }
     },
     takeBackCard: function() {
-      axios
+      this.axios
       .put('/takeback/'+this.lastCard.id)
       .then(response => {
         if (response.data.status == "OK") {
@@ -113,8 +111,8 @@ export default {
       })
     },
     takeTrick: function() {
-      const playerId = this.$cookies.get('user').playerId;
-      axios
+      const playerId = this.$parent.playerId;
+      this.axios
       .put('/taketrick/'+playerId)
       .then(response => {
         if (response.data.status == "OK") {
@@ -137,8 +135,7 @@ export default {
         this.takeTrick();
     },
     getPoints: function() {
-      const playerId = this.$cookies.get('user').playerId;
-      const myPoints = this.drawedCards.filter(card => card.playedById == playerId)
+      const myPoints = this.drawedCards.filter(card => card.playedById == this.$parent.playerId)
       .reduce((sum, card) => sum + card.points, 0);
       return myPoints;
     },

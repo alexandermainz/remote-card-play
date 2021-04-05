@@ -21,7 +21,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 export default {
   name: 'LoginForm',
   props: {
@@ -41,13 +40,13 @@ export default {
         console.log(this.user);
         this.showWaitSpinner = true;
         this.errorText = "";
-        axios
+        this.axios
         .post('/login', { email: this.user, pass: this.pass })
         .then(response => {
             if (response.data.status === undefined) {
-                this.$cookies.set('user', { playerId: response.data.playerId, nickname: response.data.nickname });
-                this.displayLogin = "none";
+                this.$parent.playerId = response.data.playerId;
                 this.$parent.playerNick = response.data.nickname;
+                this.displayLogin = "none";
                 this.$parent.refresh();
             }
             else {
@@ -74,4 +73,11 @@ form {
     margin-bottom: 10px;
 }
 
+label {
+    margin-top: 3px;
+}
+
+button {
+    margin-inline-start: 10px;
+}
 </style>
