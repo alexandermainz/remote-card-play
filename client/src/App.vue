@@ -51,7 +51,7 @@
             <span class="when-open"><b-icon icon="chevron-up" aria-hidden="true"></b-icon></span>
           </b-button>
           <b-collapse id="collapse-1" class="mt-2">
-            <b-card>
+            <div>
               <p class="card-text">Sortiere die Karten auf Deiner Hand mittels "Drag & Drop" (Klicken und ziehen).</p>
               <p class="card-text">Klicke auf eine Karte um sie zu selektieren, klicke auf die selektierte Karte, um diese auszuspielen.</p>
               <p class="card-text">Deine gespielte Karte kannst Du zurücknehmen, so lange der nächste Spieler noch nicht ausgespielt hat. Klicke hierzu auf Deine Karte auf dem Spieltisch.</p>
@@ -60,7 +60,7 @@
               <p class="card-text">Links neben dem Spieltisch siehst Du die Namen aller Spieler am Spieltisch sowie die Reihenfolge, in der die Spieler am Tisch sitzen. Die Teilnehmer am aktuellen Spiel sind <b>fett</b> gedruckt. Unter der Namensliste wird angezeigt, wer als nächster am Zug ist.</p>
               <p class="card-text">Ist das aktuelle Spiel zuende, kannst Du Deine Punkte zählen, indem Du auf Deinen Stichestapel klickst. Unter der Namensliste erscheint ein Button zum neuen Geben der Karten.</p>
               <p class="card-text">Beim Geben kannst Du ankreuzen, welche Spieler am Spieltisch im nächsten Spiel Karten bekommen sollen.</p>
-            </b-card>
+            </div>
           </b-collapse>
         </div>
         <br><br>
@@ -170,6 +170,7 @@ export default {
       if (this.players && this.players.length > 0 &&
           this.$refs.refPlayTable && this.$refs.refPlayTable.currentDraw.length == 0 &&
           this.$refs.refCardHand.playersHand.length == 0 && 
+          this.players.find(pl => pl.id == this.playerId) &&
           this.players.find(pl => pl.id == this.playerId).inCurrentRound) {
         return true;
       }
@@ -233,6 +234,7 @@ export default {
     },
     logout: function() {
       this.$cookies.remove('jwtauth');
+      localStorage.removeItem('jwtauth');
       this.playerId = 0;
       this.nickname = '';
       this.$refs.refLoginForm.displayLogin = "flex";
@@ -261,7 +263,7 @@ export default {
   },
   mounted: function() {
     console.log("Vue app created. Try to get playerId and Nickname from JWT...");
-    const jwtAuth = this.$cookies.get('jwtauth');
+    const jwtAuth = localStorage.getItem('jwtauth');
     if (jwtAuth) {    // TODO: Ablauf des JWT prüfen
       this.$refs.refLoginForm.displayLogin = "none";
       const decoded = this.$jwt.decode();

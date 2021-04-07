@@ -15,15 +15,19 @@ import VueCookies from 'vue-cookies'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueSocketIO from 'vue-socket.io'
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import { ModalPlugin, BVToastPlugin, IconsPlugin, ButtonPlugin, CollapsePlugin, FormCheckboxPlugin } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import VueJWT from 'vuejs-jwt'
 
 Vue.use(VueCookies)
 Vue.use(VueAxios, axios);
-Vue.use(BootstrapVue);
+Vue.use(ModalPlugin);
 Vue.use(IconsPlugin);
+Vue.use(BVToastPlugin);
+Vue.use(ButtonPlugin);
+Vue.use(CollapsePlugin);
+Vue.use(FormCheckboxPlugin);
 
 const serverURL = process.env.VUE_APP_SERVER_URL;
 Vue.use(new VueSocketIO({
@@ -37,7 +41,7 @@ console.log(serverURL, process.env.NODE_ENV, process.env.BASE_URL)
 const jwtPublicKey = Buffer.from(process.env.VUE_APP_JWT_PUBLIC_KEY, 'base64').toString('ascii');
 Vue.use(VueJWT, {
   signKey: jwtPublicKey,
-  storage: "cookie",
+  storage: "localStorage",
   keyName: "jwtauth",
 });
 

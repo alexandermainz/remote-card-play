@@ -37,13 +37,13 @@ export default {
   },
   methods: {
     doLogin: function() {
-        console.log(this.user);
         this.showWaitSpinner = true;
         this.errorText = "";
         this.axios
         .post('/login', { email: this.user, pass: this.pass })
         .then(response => {
             if (response.data.status === undefined) {
+                localStorage.setItem('jwtauth', response.data.token);
                 this.$parent.playerId = response.data.playerId;
                 this.$parent.playerNick = response.data.nickname;
                 this.displayLogin = "none";

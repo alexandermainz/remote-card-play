@@ -97,7 +97,7 @@ app.post("/login", (req, res) => {
                         });
                         res.header({ "Access-Control-Expose-Headers": "Set-Cookie" });
                         res.cookie("jwtauth", token, { maxAge: (24*60*60) * 1000, httpOnly: false });
-                        res.json(row);
+                        res.json({ ...row, "token": token });
                     }
                     else
                         res.status(401).json({ status: "Error", statustext: "Benutzername oder Kennwort fehlen oder sind falsch." });
