@@ -18,7 +18,9 @@
           <div id="playerlist" class="col-md-2">
             <p>Spieler:</p>
             <ol>
-            <li v-for="(player) in players" :key='player.id' v-bind:class="{ playerinround: player.inCurrentRound }">
+            <li v-for="(player) in players" :key='player.id' 
+              v-bind:class="{ playerinround: player.inCurrentRound, playerinturn: player.nickname==nextPlayerNick }"
+            >
               {{player.nickname}}
             </li></ol>
             <p>Runde {{ getRound() }}</p>
@@ -105,6 +107,7 @@ export default {
       hasTricks: false,
       players: [],
       playerNick: '',
+      nextPlayerNick: '',
       playerId: 0,
       selectedPlayers: [],
       myPoints: -1
@@ -143,22 +146,34 @@ export default {
       return this.players.filter(elm => elm.inCurrentRound).length;
     },
     getNextPlayerName: function() {
-      if (this.$refs.refPlayTable && this.$refs.refPlayTable.lastCard && this.players.length > 0) {
-        if (!this.isRoundReady()) {
-          const playerId = this.$refs.refPlayTable.lastCard.playedById;
-          const indx = this.players.findIndex(elm => elm.id == playerId);
-          let nextIndx = (indx+1) % this.players.length;
-          while (!this.players[nextIndx].inCurrentRound)
-            nextIndx = (nextIndx+1) % this.players.length;
-          return this.players[nextIndx].nickname;
+      var nextPlayerNick = "";
+      if (this.$refs.refPlayTable && this.players.length > 0) {
+        if (this.$refs.refPlayTable.lastCard) {
+          if (!this.isRoundReady()) {
+            const playerId = this.$refs.refPlayTable.lastCard.playedById;
+            const indx = this.players.findIndex(elm => elm.id == playerId);
+            let nextIndx = (indx+1) % this.players.length;
+            while (!this.players[nextIndx].inCurrentRound)
+              nextIndx = (nextIndx+1) % this.players.length;
+            nextPlayerNick = this.players[nextIndx].nickname;
+          }
+          else {
+            const winnerCard = this.$refs.refPlayTable.getWinnerCard();
+            nextPlayerNick = (winnerCard.playedBy + " (Stich gemacht!)");
+          }
         }
         else {
-          const winnerCard = this.$refs.refPlayTable.getWinnerCard();
-          return (winnerCard.playedBy + " (Stich gemacht!)");
+          // try to find out who is in turn for the first card of this round
+          const round = this.getRound();
+          if (round > 1) {
+            const winner = this.$refs.refPlayTable.drawedCards.find(card => card.round == (round-1)).wonByPlayerId;
+            nextPlayerNick = this.players.find(player => player.id == winner).nickname;
+          }
         }
       }
 
-      return "";
+      this.nextPlayerNick = nextPlayerNick;
+      return this.nextPlayerNick;
     },
     isRoundReady: function() {
       if (this.$refs.refPlayTable && this.$refs.refPlayTable.lastCard && this.players.length > 0)
@@ -217,7 +232,9 @@ export default {
     },
     tricksClicked: function() {
       if (this.isGameReady()) {
-        // count points
+        // count points 
+        // TODO Autoamtisches Addieren der Zusammenspieler?
+        //TODO: SOLO-Taste?
         this.myPoints = this.$refs.refPlayTable.getPoints();
       }
       else {
@@ -233,6 +250,7 @@ export default {
       }
     },
     logout: function() {
+      localStorage.removeItem('handsort');
       this.$cookies.remove('jwtauth');
       localStorage.removeItem('jwtauth');
       this.playerId = 0;
@@ -256,6 +274,10 @@ export default {
     // Fired when the server sends something on the "refreshTable" channel.
     refreshTable(data) {
       this.$refs.refPlayTable.getDraws();
+    },
+
+    clearSortedHand() {
+      localStorage.removeItem('handsort');
     }
   },
   computed: {
@@ -299,7 +321,7 @@ ol {
 }
 
 .playerinturn {
-  color: greenyellow;
+  color: blue;
 }
 
 #playershand {

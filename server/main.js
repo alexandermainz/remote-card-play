@@ -177,6 +177,8 @@ app.post("/createGame", authenticateToken, (req, res) => {
                         else {
                             let gameId = this.lastID;
                             console.log(`A row has been inserted with rowid ${gameId}`);
+                            // send event to the client to clear the card sort data
+                            sio.emit('clearSortedHand'); 
                             // get all cards for the deck
                             db.all("SELECT c.cardId, d.cardsPerPlayer FROM decks_cards c JOIN decks d ON d.id=c.deckId" +
                             " WHERE deckId = (select deckId FROM tables WHERE id=(SELECT currentTable FROM players WHERE id=?))", 
@@ -207,6 +209,10 @@ app.post("/createGame", authenticateToken, (req, res) => {
                                                 // mark card as given
                                                 rows[card].cardId = 0;
                                                 givenCards++;
+                                            }
+                                            else {
+                                                // all cards are given to the players, nor emit clioent refresh event
+                                                sio.emit('refreshTable'); 
                                             }
                                         }  // for no. of cards per player
                                         // mark this player as participator of this round
@@ -264,7 +270,8 @@ app.get("/draws", authenticateToken, (req, res) => {
             res.status(500).json({ status: "Error", statustext: "Could not connect to the database!" });
         }
         else {
-            db.all("select d.id, d.round, d.position, c.image, p.id AS playedById, p.nickname AS playedBy, d.winner AS wonByPlayerId,"+
+            db.all("select d.id, d.round, d.position, c.image, c.color, c.value," +
+            " p.id AS playedById, p.nickname AS playedBy, d.winner AS wonByPlayerId,"+
             " (select rank from decks_cards cd where cd.cardId=c.id limit 1) AS rank," +
             " (select trump from decks_cards cd where cd.cardId=c.id limit 1) AS trump," +
             " (select points from decks_cards cd where cd.cardId=c.id limit 1) AS points" +

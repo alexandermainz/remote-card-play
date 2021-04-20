@@ -4,11 +4,12 @@
     <div v-if="!lastTrick || lastTrick.length <= 0">
       <div v-for="(card, idx) in currentDraw" :key='card.id' class="cardontable" v-bind:style="'left:-'+(idx*3)+'%;'">
         <img v-bind:src="'resources/' + card.image" class="playingcard" v-bind:title="card.playedBy" v-on:click="cardClicked(card);" draggable="false">
+        <div>{{card.playedBy}}</div>
       </div>
     </div>
 
     <div id="last-trick-show" v-if="lastTrick && lastTrick.length > 0">
-      <p>Letzter Stich:</p>
+      <p>Letzter Stich: <span style="font-size:smaller;">(Karten anklicken zum Verbergen)</span></p>
       <div v-for="(draw, idx) in lastTrick" :key='draw.id' class="cardontable" v-bind:style="'left:-'+(idx*4.5)+'%;'">
         <img v-bind:src="'resources/' + getDrawById(draw.id).image" class="playingcard" v-bind:title="getDrawById(draw.id).playedBy" v-on:click="showLastTrickClicked()" draggable="false">
       </div>
@@ -31,7 +32,7 @@ export default {
         errorText: "",
         showWaitSpinner: false,
         drawedCards: [],
-        currentDraw: [],
+        currentDraw: [], // { draw.id, draw.round, draw.position, card.image, card.color, card.value, playedById, playedBy, wonByPlayerId, rank, trump, points }
         lastTrick: []
     }
   },
@@ -61,11 +62,18 @@ export default {
       return this.drawedCards.find(card => card.id == drawId);
     },
     getWinnerCard: function() {
-      let winnerCard;
+      // TODO: Right now, only rules for a trick in "Doppelkopf" is implemented
+      let winnerCard = this.currentDraw.find(card => card.position == 1);  // first card on table gets in front win opportunity
       this.currentDraw.forEach((card, index, arr) => {
-        if (!winnerCard || (winnerCard.trump == card.trump && card.rank > winnerCard.rank) || card.trump > winnerCard.trump)
+        if  (card.trump > winnerCard.trump || // trump beats no-trump
+            (card.trump == 1 && winnerCard.trump == 1 && card.rank > winnerCard.rank) ||  // higher-rank trump beats lower-rank trump
+            (card.trump == 1 && winnerCard.trump == 1 && card.rank == winnerCard.rank && card.color == "Herz" && card.value == "10" && card.position > winnerCard.position) ||  // second Herz10 beats
+            (card.trump == 0 && winnerCard.trump == 0 && card.color == winnerCard.color && card.rank > winnerCard.rank) ||  // higher-rank card beats lower-rank card of same color
+            (card.rank == winnerCard.rank && card.color == winnerCard.color && card.position < winnerCard.position)  // first card on table beats same rank of same color
+           )
           winnerCard = card;
       });
+      //console.log("WinnerCard: ", winnerCard);
       return winnerCard;
     },
     getCurrentRound: function() {
@@ -74,8 +82,10 @@ export default {
       return roundOfLastTrick + 1;
     },
     cardClicked: function(card) {
+      const playerId = this.$parent.playerId;
+
       // last played card can be revoked by the one who played it
-      if (this.lastCard.playedById == this.$parent.playerId) {
+      if (this.lastCard.playedById == playerId) {
         // if this was the last card, take back or take the trick?
         if (this.currentDraw.length == this.$parent.getNumPlayersInRound()) {
           this.$bvModal.show('takeTrickModal');
@@ -135,7 +145,7 @@ export default {
         this.takeTrick();
     },
     getPoints: function() {
-      const myPoints = this.drawedCards.filter(card => card.playedById == this.$parent.playerId)
+      const myPoints = this.drawedCards.filter(card => card.wonByPlayerId == this.$parent.playerId)
       .reduce((sum, card) => sum + card.points, 0);
       return myPoints;
     },

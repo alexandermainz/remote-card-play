@@ -40,6 +40,7 @@ export default {
             .finally(() => this.showWaitSpinner = false)
         },
         cardClicked: function(position) {
+            //TODO: Ausspielen berhindern wenn man nicht dran ist ?!
             const handId = this.sortedHand[position];
             const index = this.playersHand.findIndex(aCard => aCard.id == handId)
             if (!this.playersHand[index].clicked)
