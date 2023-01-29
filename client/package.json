@@ -7,7 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "@vue/cli-service": "^4.5.11",
+    "@vue/cli-service": "^5.0.8",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "bootstrap-vue": "^2.21.2",
@@ -19,7 +19,7 @@
     "vuejs-jwt": "^1.1.0"
   },
   "devDependencies": {
-    "@vue/cli-service": "~4.5.0",
+    "@vue/cli-service": "~5.0.8",
     "vue-template-compiler": "^2.6.11"
   },
   "browserslist": [
