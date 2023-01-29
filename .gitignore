@@ -1,3 +1,5 @@
+client/public/resources/*.svg
+
 # Logs
 logs
 *.log
@@ -105,3 +107,4 @@ dist
 
 # the sqlite local DB
 db/
+tmp.sql
