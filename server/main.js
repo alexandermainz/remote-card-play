@@ -18,6 +18,17 @@ const {
 const port = 80;
 
 const app = express();
+
+// set up rate limiter: maximum of four requests per second
+const rateLimit = require('express-rate-limit');
+const limiter = rateLimit({
+  windowMs: 1000, // 1 second
+  max: 4
+});
+// apply rate limiter to all requests
+app.use(limiter);
+
+// set up CORS
 app.use(
     cors({
       origin: true, // allow to server to accept request from different origin
