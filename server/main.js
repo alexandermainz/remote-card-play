@@ -9,6 +9,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const express = require("express");
 const cors = require('cors');
+const csrf = require("csurf");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const dotenv = require('dotenv').config();
@@ -36,6 +37,9 @@ app.use(
       credentials: true // allow session cookie from browser to pass through
     })
 );
+
+// setup CSRF
+app.use(csrf({ cookie: true }));
 
 const sio = require('socket.io')(app.listen(port, () => console.log(`App listening on port ${port}!`)),
 {
